@@ -11,3 +11,12 @@ app.get('/', (req, res) => {
 app.listen(PORT, HOST, () => {
   console.log(`Running on http://${HOST}:${PORT}`)
 })
+
+const gracefulExit = (signal) => {
+  console.log(`${signal} received: closing HTTP server`)
+  process.exit(0)
+}
+
+process.on('SIGINT', gracefulExit)
+process.on('SIGQUIT', gracefulExit)
+process.on('SIGTERM', gracefulExit)

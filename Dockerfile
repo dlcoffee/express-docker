@@ -15,6 +15,12 @@ EXPOSE 8080
 
 FROM base as dev
 
+# Add Tini
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-amd64 /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
+
 # "Lift" node_module installation
 WORKDIR /opt/node_app/
 
@@ -33,7 +39,7 @@ WORKDIR /opt/node_app/app
 # Bundle app source
 COPY . .
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "nodemon", "server.js" ]
 
 ####################################################################################
 # docker build . -t docker-test-prod --target=prod
