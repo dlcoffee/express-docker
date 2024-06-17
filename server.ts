@@ -1,18 +1,19 @@
-const express = require('express')
+import express from 'express'
 
 const PORT = 8080
 const HOST = '0.0.0.0'
 
 const app = express()
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+
+app.get('/', (_req, res) => {
+  res.send('Hello World')
 })
 
 app.listen(PORT, HOST, () => {
   console.log(`Running on http://${HOST}:${PORT}`)
 })
 
-const gracefulExit = (signal) => {
+const gracefulExit = (signal: string) => {
   console.log(`${signal} received: closing HTTP server`)
   process.exit(0)
 }

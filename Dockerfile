@@ -39,7 +39,8 @@ WORKDIR /opt/node_app/app
 # Bundle app source
 COPY . .
 
-CMD [ "nodemon", "server.js" ]
+# CMD [ "nodemon", "server.js" ] recommended approach since tini works better with it
+CMD [ "npm", "run", "dev" ]
 
 ####################################################################################
 # docker build . -t docker-test-prod --target=prod
