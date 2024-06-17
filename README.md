@@ -15,3 +15,4 @@ through docker.
   docker. all we really need is for `package.json` to update properly.
   - if doing this approach, we need to rebuild the image so that it
     can be installed.
+- if you're on windows then DO NOT commit package-lock.json

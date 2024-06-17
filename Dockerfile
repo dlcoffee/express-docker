@@ -2,6 +2,7 @@
 # debug:
 #   docker images "docker-test"
 #   docker run --rm -it --entrypoint sh docker-test-dev
+#   docker container exec -it docker-test-dev sh
 
 ####################################################################################
 FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:20.6.1-slim as base
@@ -26,7 +27,8 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-stati
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 
-WORKDIR /opt/node_app/app
+# "Lift" node_module installation. Since we bind mount, the node_modules/ in the container get overshadowed
+WORKDIR /opt/node_app/
 
 COPY package.json ./
 # we actually don't really want package-lock.json to be copied since it's OS dependent
@@ -34,11 +36,17 @@ COPY package.json ./
 
 RUN npm install
 
+# add the lifted node_modules to the path
+ENV PATH /opt/node_app/node_modules/.bin:$PATH
+
+# now switch to the actual code
+WORKDIR /opt/node_app/app
+
 # Bundle app source
 COPY . .
 
 # CMD [ "nodemon", "server.js" ] recommended approach since tini works better with it
-CMD [ "npm", "run", "dev" ]
+CMD ["npm", "run", "dev"]
 
 
 ####################################################################################
