@@ -7,7 +7,7 @@
 ####################################################################################
 FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:20.6.1-slim as base
 
-WORKDIR /opt/node_app/app
+WORKDIR /opt/node_app/
 
 EXPOSE 8080
 
@@ -27,20 +27,11 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-stati
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 
-# "Lift" node_module installation. Since we bind mount, the node_modules/ in the container get overshadowed
-WORKDIR /opt/node_app/
-
 COPY package.json ./
 # we actually don't really want package-lock.json to be copied since it's OS dependent
 # COPY package-lock.json ./
 
 RUN npm install
-
-# add the lifted node_modules to the path
-ENV PATH /opt/node_app/node_modules/.bin:$PATH
-
-# now switch to the actual code
-WORKDIR /opt/node_app/app
 
 # Bundle app source
 COPY . .
@@ -73,15 +64,12 @@ RUN npm run build
 
 FROM builder as prod
 
-WORKDIR /opt/node_app/app
-
 ENV NODE_ENV production
 
 COPY package.json ./
 
 RUN npm install --omit=dev
 
-COPY --from=builder /opt/node_app/app/dist/ dist/
+COPY --from=builder /opt/node_app/dist/ dist/
 
 CMD [ "node", "dist/server.js" ]
-

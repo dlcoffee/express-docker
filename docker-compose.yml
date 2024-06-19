@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  dev:
+    platform: linux/amd64
+    build:
+      context: .
+      target: dev
+    # env_file:
+    #   - ./app/.env
+    ports:
+      - 8080:8080
+    command:
+      - npm
+      - run
+      - dev
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: ./opt/node_app/
+          ignore:
+            - node_modules/
+
+  prod:
+    platform: linux/amd64
+    build:
+      context: .
+      target: prod
+    # env_file:
+    #   - ./app/.env
+    ports:
+      - 8080:8080
